@@ -1,0 +1,27 @@
+# Archivos compilados de Java
+*.class
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Carpetas de build (por si usás herramientas más adelante)
+bin/
+build/
+out/
+
+# Archivos de sistema (Windows)
+Thumbs.db
+
+# Archivos de sistema (Mac)
+.DS_Store
+
+# Configuración de VS Code
+.vscode/
+
+# Archivos de IntelliJ / otros IDEs
+.idea/
+*.iml
