@@ -117,6 +117,31 @@ public class Modelo {
     }
 
 
+
+    //Metodos para el inciso c)
+    public double getCostoBordado(){
+        if (bordado!=null){                   //De antemano pregunto si es null, de otra forma explotaria con null pointer exception
+            return bordado.getCostoServicio();
+        }
+        return 0;
+    }
+
+    public double getCostoDiseno(){
+        double total = 0;
+        for(Empresa e : disenadoras){
+            total += e.getCostoServicio();
+        }
+        return total;
+    }
+
+    public double getCostoBasicoTotal(){
+        return costoMateriaPrima + costoManoObra + getCostoBordado() + getCostoDiseno();
+    }
+
+
+
+
+
     
 
     
