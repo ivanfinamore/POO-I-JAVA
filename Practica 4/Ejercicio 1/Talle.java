@@ -44,6 +44,11 @@ public class Talle {
         this.porcentajeAdicional = porcentajeAdicional;
     }
 
+    //Metodo para inciso f). Recibe parametros porque el talle no sabe a que modelo pertenece: la relacion va de Modelo a Talle
+    //El modelo le debe pasar su costo basico total y su materia prima
+    public double calcularCosto(double costoMateriaPrima, double costoBasicoTotal){
+        return costoBasicoTotal + (costoMateriaPrima * (porcentajeAdicional / 100));
+    }
 
     
 }

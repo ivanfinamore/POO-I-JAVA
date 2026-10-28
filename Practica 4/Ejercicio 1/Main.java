@@ -6,7 +6,7 @@ public class Main {
 
     static final String FABRICA = "Remeras siempre remeras S.A."; //Enunciado
     static final int CANT_MODELOS = 2; //Enunciado
-    static final int CANT_TALLES = 1; //Enunciado
+    static final int CANT_TALLES = 3; //Enunciado
 
 
     //Variables que usan todos los metodos del main
@@ -20,8 +20,17 @@ public class Main {
     public static void main(String[] args) {
 
         cargarEmpresas();
-        cargarModelos();        //b
-        listarMusculosas();    //c
+        cargarModelos();           //b
+        listarMusculosas();       //c
+        modificarModelo();       //d
+        contarTelas();          //e
+        mostrarModelo();       //f
+        mostrarModelo();
+
+
+
+
+
 
     
 
@@ -104,20 +113,8 @@ public class Main {
                 
             }
 
-
-            //Cargo todos los colores que tiene el modelo
-            ArrayList<String> colores = new ArrayList<>();
-            String otro;
-
-            //Es un do-while porque el enunciado pide uno o varios colores
-            do { 
-                System.out.println("Color: ");
-                colores.add(sc.nextLine());
-                System.out.println("¿Otro color? (s/n):");
-                otro = sc.nextLine();
-            } while (otro.equalsIgnoreCase("s"));   //Si se quiere agregar otro color, "S" o "s", y vuelve al do
-                                                    //No va el while simple porque este evalua la condicion al principio
-
+            //Utilizo el metodo que retorna los colores que se van agregando al arreglo dinamico
+            ArrayList<String> colores = leerColores();
 
             //Se muestra la lista de empresas precargadas y enumeradas para que el usuario sepa cual elegir del bordado
             System.out.println("Empresas: ");
@@ -171,12 +168,31 @@ public class Main {
         }
     }
 
+    //Me sirve para el inciso b) y posteriormente para el d)
+    //Lee (retorna) todos los colores que se van agregando al arreglo dinamico "colores"
+    static ArrayList<String> leerColores() {
+
+        ArrayList<String> colores = new ArrayList<>();
+            String otro;
+
+            //Es un do-while porque el enunciado pide agregar uno o varios colores
+            do { 
+                System.out.println("Color: ");
+                colores.add(sc.nextLine());
+                System.out.println("¿Otro color? (s/n):");
+                otro = sc.nextLine();
+            } while (otro.equalsIgnoreCase("s"));   //Si se quiere agregar otro color se ingresa "S" o "s", y el programa vuelve al 'do'
+                                                    //No va el while simple porque este evalua la condicion al principio. Necesitamos que lo haga al final
+            return colores;
+    }
+
+
 
     //Inciso c: listar musculosas con distintos atributos
     static void listarMusculosas(){
 
         //Formato de columnas, pedido por el inciso c
-        System.out.println("\n" +FABRICA+ " -------- TEMPORADA: " + Modelo.getTemporada());        //Como es static, accedo con el nombre de la clase. Es el mismo valor compartido por todos los objetos (Invierno)
+        System.out.println("\n" +FABRICA+ " -------- TEMPORADA: " + Modelo.getTemporada() + " ------ MUSCULOSAS");        //Como es static, accedo con el nombre de la clase. Es el mismo valor compartido por todos los objetos (Invierno)
         System.out.printf("%-7s %-10s %-11s %-18s %-14s %9s %9s %9s %9s %10s%n", 
                           "Codigo", "Tela", "Fecha", "Bordador", "CUIT", "M.Obra", 
                           "M.Prima", "Bordado", "Diseño", "Total"); //Imprimo con formato. Cada % se reemplaza, en orden, por el valor que va despues de la coma
@@ -226,6 +242,108 @@ public class Main {
     }
 
 
+
+    //Me sirve para el inciso d), donde busco un modelo por su codigo
+    static Modelo buscarModelo(int codigo){
+        for (Modelo m : modelos){
+            if (m.getCodigo() == codigo){
+                return m;
+            }
+        }
+        return null;
+    }
+
+    //Inciso d: modifico el modelo; el costo de materia prima, mano de obra, y colores
+    static void modificarModelo(){
+        System.out.println("\n¿Desea modificar algun modelo? (s/n)");
+
+        if(sc.nextLine().equalsIgnoreCase("s")){                               
+            System.out.println("Ingrese el codigo del modelo a modificar: ");
+            int cod = sc.nextInt();
+
+            Modelo mod = buscarModelo(cod);
+
+            if (mod == null){
+                System.out.println("No existe un modelo con ese codigo");
+                return;
+            }
+
+            System.out.println("Nuevo costo de materia prima: ");
+            mod.setCostoMateriaPrima(sc.nextDouble());              //Hace las dos cosas en una misma linea: lee el numero y se lo pasa al setter
+
+            System.out.println("Nuevo costo de mano de obra: ");
+            mod.setCostoManoObra(sc.nextDouble());
+            sc.nextLine();
+
+            System.out.println("Ingrese los nuevos colores");
+            mod.setColores(leerColores());                         //leerColores() retorna todos los colores que se agregan al arreglo y se los pasa al setter
+
+            System.out.println("\nModelo modificado!");
+
+
+        }
+
+    }
+
+
+    //Inciso e: me pide indicar la cantidad de remeras cuya tela coincide con alguna de las cadenas "eda" o "god"
+    static void contarTelas(){
+        int cant = 0;
+
+        for(Modelo m : modelos){
+            String tela = m.getTela().toLowerCase();
+            if(tela.contains("eda") || tela.contains("god")){
+                cant++;
+            }
+        }
+
+        System.out.println("\nRemeras con tela que contiene 'eda' o 'god': " + cant);
+    }
+
+
+
+
+    //Inciso f: me pide mostrar, dado un codigo de modelo de remera ingresado, los colores, talles (incluyendo numero y costos), empresas diseñadoras (razones sociales), fecha, y comentarios de un cambio si existiese
+    static void mostrarModelo(){
+        System.out.println("\nPara consultar un modelo, ingrese su codigo: ");
+        int codigo = sc.nextInt();
+        sc.nextLine();
+
+        Modelo m = buscarModelo(codigo);
+
+        if(m == null){
+            System.out.println("\nNo existe un modelo con ese codigo");
+            return;
+        }
+
+        //Muestro colores
+        System.out.println("\nColores: " + m.getColores());
+
+
+        //Muestro los talles y sus costos
+        for(Talle t : m.getTalles()){                                                                              //t es cada talle que tiene el modelo
+            double costo = t.calcularCosto(m.getCostoMateriaPrima(), m.getCostoBasicoTotal());                     //A cada talle le pido su costo, pasandole los datos del modelo (costo materia prima, costo basico total)
+            System.out.printf("\nNumero de talle: %d ------- Costo total: $ %.2f%n", t.getNumero(), costo);     //Imprime el numero y el costo total de cada talle
+        }
+
+
+        //Muestro empresas diseñadoras (razones sociales)
+        if(m.getDisenadoras().isEmpty()){          //Devuelve True si no hay ningun elemento dentro
+            System.out.println("\nNo hay empresas diseñadoras");
+        } else {
+            System.out.println("\nEmpresas diseñadoras: ");
+            for (Empresa e : m.getDisenadoras()){
+                System.out.println(" " + e.getRazonSocial());
+            }
+        }
+
+
+        //Muestro fecha y comentarios de cambios, siempre y cuando existan
+        if (m.getCambio() != null){
+            System.out.println("\nCambio: " + m.getCambio().getFecha() + " ---- " + m.getCambio().getComentario());
+        }
+
+    }
 
 }
 
