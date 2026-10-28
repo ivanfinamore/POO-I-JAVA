@@ -5,8 +5,8 @@ import java.util.Scanner;
 public class Main {
 
     static final String FABRICA = "Remeras siempre remeras S.A."; //Enunciado
-    static final int CANT_MODELOS = 2; //Enunciado
-    static final int CANT_TALLES = 3; //Enunciado
+    static final int CANT_MODELOS = 3; //Enunciado
+    static final int CANT_TALLES = 4; //Enunciado
 
 
     //Variables que usan todos los metodos del main
@@ -20,12 +20,21 @@ public class Main {
     public static void main(String[] args) {
 
         cargarEmpresas();
-        cargarModelos();           //b
-        listarMusculosas();       //c
-        modificarModelo();       //d
-        contarTelas();          //e
-        mostrarModelo();       //f
-        mostrarModelo();
+        cargarModelos();                //b
+        listarMusculosas();            //c
+        modificarModelo();            //d
+        contarTelas();               //e
+
+        String otra;                                                    //f
+        do {                                                            //f
+            mostrarModelo();                                            //f
+            System.out.println("¿Consultar otro modelo? (s/n): ");      //f
+            otra = sc.nextLine();                                       //f
+        } while (otra.equalsIgnoreCase("s"));                           //f
+
+        
+        totalPorBordador();        //g
+        empresasNoContratadas();  //h
 
 
 
@@ -343,6 +352,50 @@ public class Main {
             System.out.println("\nCambio: " + m.getCambio().getFecha() + " ---- " + m.getCambio().getComentario());
         }
 
+    }
+
+    //Inciso g: Indicar el importe total que la fabrica debe abonar a cada una de las empresas bordadoras por los bordados
+    static void totalPorBordador(){
+        System.out.println("\n--- Total a abonar a cada empresa por bordados ---");
+
+        //Evaluo primero empresa por empresa
+        for (Empresa e : empresas){
+            double total = 0;
+
+            //Cada modelo conoce la empresa bordadora, pero la empresa bordadora no conoce los modelos que fueron bordados
+            for (Modelo m : modelos){
+                if(m.getBordado() == e){
+                    total += e.getCostoServicio();
+                }
+            }
+
+            //Antes de pasar a la siguiente empresa, imprime la razon social y el total que la fabrica le debe a tal empresa por los bordados
+            if (total > 0){
+                System.out.printf("%s: $ %.2f%n", e.getRazonSocial(), total);
+            }
+        }
+    }
+
+
+    //Inciso h: Mostrar el nombre de las empresas que nunca fueron contratadas por la fabrica (bordado y diseño, ambas)
+    static void empresasNoContratadas(){
+        System.out.println("\n--- Empresas nunca contratadas ---");
+
+        for (Empresa e : empresas){
+            boolean contratada = false;
+
+            for (Modelo m : modelos){
+                if (m.getBordado() == e || m.getDisenadoras().contains(e)){     //Diseñadoras lleva contains porque es un arreglo; varias empresas pueden formar parte del diseño
+                    contratada = true;
+                } 
+            }
+
+            //Si no fue contratada, se muestra en pantalla
+            if (!contratada){
+                System.out.println(e.getRazonSocial());
+            }
+
+        }
     }
 
 }
