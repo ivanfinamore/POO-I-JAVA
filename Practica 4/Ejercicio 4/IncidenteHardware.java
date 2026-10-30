@@ -29,6 +29,51 @@ public class IncidenteHardware extends Incidente {
 
 
 
+
+    //Me sirve para el inciso j)
+    public static boolean esIpValida(String ip){
+        String[] partes = ip.split("\\.");  //Divido la ip en partes, cada una representada entre puntos. Esto me va a servir para validarla
+        
+
+        //1ª condicion de una ip: Toda ipv4 se compone de 4 partes - 4 grupos de numeros. Si hay mas o menos, no es ip.
+        if(partes.length != 4){
+            return false;           
+        }
+
+        
+        for(String parte : partes){     //Evaluo cada parte de la ip (cada grupo de numeros) por separado
+
+
+            //2ª y 3ª condicion: No puede haber partes vacias (no haber numeros, o sea dos puntos seguidos), ni tampoco puede esta superar las 3 cifras.
+            if (parte.isEmpty() || parte.length() > 3){     
+                return false;
+            }
+
+
+            //4ª condicion: cada parte no puede ser mayor a 255 ya que se completa el octeto de bits.
+            if(Integer.parseInt(parte) > 255){
+                return false;
+            }
+
+            
+            for(char c : parte.toCharArray()){  //Evaluo cada digito de la ip
+
+                //5ª condicion: si un digito de la parte evaluada no es un numero, no es una ip.
+                if(!Character.isDigit(c)){
+                    return false;
+                }
+            }
+
+        }
+
+        return true; //Si no presenta las anomalias de las condiciones, es una ip valida.
+    
+    
+    }
+
+
+
+
     
 
 

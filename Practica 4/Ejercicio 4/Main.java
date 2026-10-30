@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -74,6 +75,9 @@ public class Main {
 
 
 
+
+
+
     //Inciso j)
     static void ingresarIncidente(){
         System.out.println("\n¿Cuantos incidentes va a registrar?: ");
@@ -86,7 +90,7 @@ public class Main {
 
             //Primero se pregunta el tipo, porque define que datos se piden al final
             System.out.println("\nTipo (1 = Hardware, 2 = Software): ");
-            int tipo = sc.nextInt();
+            int tipoIncidente = sc.nextInt();
             sc.nextLine();
 
 
@@ -106,12 +110,109 @@ public class Main {
             String comentario = sc.nextLine();
 
 
+            Empleado informante = elegirInformante();
+
             Empleado tecnico = elegirTecnico();
 
-            if(tipo == 1){
+            
+            Incidente inc;  //Se crea la variable donde se va a guardar el incidente (debe ser de clase padre, para poder apuntar a un objeto de hardware y de software - subclases)
+
+            
+            if(tipoIncidente == 1){
+
+                String ip;
+                do{
+                    System.out.println("\nIP del equipo: ");
+                    ip = sc.nextLine();
+
+                    if (!IncidenteHardware.esIpValida(ip)){
+                        System.out.println("La IP ingresada no es valida. Ingrese una correcta (ejemplo: 192.168.70.3)");
+                    }
+
+                }while(!IncidenteHardware.esIpValida(ip));
+
+
+                ArrayList<String> repuestos = new ArrayList<>();
+
+                System.out.println("¿Cuantos repuestos se cambiaron?: ");
+                int cant_repuestos = sc.nextInt();
+                sc.nextLine();
+
+                for(int k = 0; k < cant_repuestos; k++){
+
+                    System.out.println(" Repuesto " +(k + 1)+ ": ");
+                    repuestos.add(sc.nextLine());
+
+                }
+
+                inc = new IncidenteHardware(fecha, reporte, urgente, comentario, informante, tecnico, ip, repuestos);   //Creo el objeto incidente hardware
+
+
+            } else{
+
+                ArrayList<SistemaAfectado> afectados = new ArrayList<>();
+
+                String otro;
+                do { 
+                    System.out.println("Sistemas: ");
+
+                    for(int j = 0; j < sistemas.size(); j++){
+
+                        System.out.println(" "+(j+1)+": " +sistemas.get(j).getNombreAplicacion());
+                        
+                    }
+                        System.out.println("\nSistema afectado: ");
+                        int opcion = sc.nextInt();
+                        sc.nextLine();
+
+                        System.out.println("Mensaje de error: ");
+                        String mensaje = sc.nextLine();
+
+                        afectados.add(new SistemaAfectado(sistemas.get(opcion - 1), mensaje));
+
+                        System.out.println("¿Otro sistema afectado? (s/n): ");
+                        otro = sc.nextLine();
+
+                    
+                } while (otro.equalsIgnoreCase("s"));
+
+                inc = new IncidenteSoftware(fecha, reporte, urgente, comentario, informante, tecnico, afectados);
 
             }
+
+            incidentes.add(inc);    //añado el incidente a la lista de incidentes
+
+            System.out.println("Incidente Nº: " +inc.getNumero()+ " registrado.");
+
+
         }
+
+
+    }
+
+
+
+
+
+
+    //Me sirve para el inciso j) 
+    static Empleado elegirInformante(){
+
+        System.out.println("Empleado que lo reporto: \n");
+
+        for(int i = 0; i < empleados.size(); i++){
+    
+            Empleado e = empleados.get(i);
+
+            System.out.println(" " + (i + 1) + ":  " + e.getApellido() + ", " + e.getNombre());
+        }
+
+        System.out.println("\n Opcion:");
+        int opcion = sc.nextInt();
+        sc.nextLine();
+
+        return empleados.get(opcion - 1);
+
     }
 
 
@@ -125,11 +226,29 @@ public class Main {
             }
         }
 
-        for (Empleado tecnico : tecnicos){
-            System.out.println();
+        System.out.println("Tecnico asignado: \n");
+
+        for (int i = 0; i < tecnicos.size(); i++){
+
+            Empleado t = tecnicos.get(i);    //cada t es un tecnico y ademas una posicion del arreglo de tecnicos
+
+            System.out.println(" " + (i + 1) + ":  " + t.getApellido() + ", " + t.getNombre());
         }
+
+        System.out.println("\n Opcion: ");
+        int opcion = sc.nextInt();
+        sc.nextLine();
+
+        return tecnicos.get(opcion - 1);
         
     }
+
+
+
+
+
+
+
 
 
 }

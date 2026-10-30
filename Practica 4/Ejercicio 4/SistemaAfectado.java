@@ -3,7 +3,7 @@ public class SistemaAfectado {
     private Sistema sistema;    //Relacion con Sistema: sirve para indicar cual de los sistemas de la empresa fue el afectado
 
 
-    public SistemaAfectado(String mensajeError, Sistema sistema) {
+    public SistemaAfectado(Sistema sistema, String mensajeError) {
         this.mensajeError = mensajeError;
         this.sistema = sistema;
     }
