@@ -6,7 +6,7 @@ public class Tarea {
     private int duracionEnMinutos;
 
 
-    public Tarea(String descripcion, int duracionEnMinutos, LocalDate fecha) {
+    public Tarea(String descripcion, int duracionEnMinutos) {
         this.descripcion = descripcion;
         this.duracionEnMinutos = duracionEnMinutos;
         this.fecha = LocalDate.now();

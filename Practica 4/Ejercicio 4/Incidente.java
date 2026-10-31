@@ -64,7 +64,8 @@ public abstract class Incidente {
     
 
     
-
+    //Metodo de superclase que me sirve para inciso l). Es abstract: obliga a cada subclase a escribir su propia version (polimorfismo)
+    public abstract String getAfectado();
 
     
     

@@ -23,15 +23,25 @@ public class Main {
         do { 
             System.out.println("\n------------------------ MESA DE AYUDA - Hard Soft S.A. --------------------------\n");
             System.out.println("1. Registrar incidentes");
+            System.out.println("2. Registrar tareas de un incidente");
+            System.out.println("3. Incidentes resueltos del mes por area");
+            System.out.println("4. Buscar repuestos cambiados");
+            System.out.println("5. Tecnicos sin asignar em los ultimos 6 meses");
+            System.out.println("6. Hardware resueltos por encima del promedio");
+            System.out.println("7. ¿Software pendientes son todos propios?");
             System.out.println("0. Salir");
 
-            System.out.println("Ingresar opcion: ");
+            System.out.println("\nIngresar opcion: ");
             opcion = sc.nextInt();
             sc.nextLine();
 
             switch (opcion) {
 
                 case 1 -> ingresarIncidente();                          //j
+
+                case 2 -> registrarTareas();                            //k
+
+                case 3 -> listarResueltosDelMes(args[0]);                                              //l
 
                 case 0 -> System.out.println("Fin del programa.");
 
@@ -89,9 +99,19 @@ public class Main {
 
 
             //Primero se pregunta el tipo, porque define que datos se piden al final
-            System.out.println("\nTipo (1 = Hardware, 2 = Software): ");
-            int tipoIncidente = sc.nextInt();
-            sc.nextLine();
+            int tipoIncidente;
+            do { 
+                System.out.println("\nTipo (1 = Hardware, 2 = Software): ");
+                tipoIncidente = sc.nextInt();
+                sc.nextLine();
+
+                if(tipoIncidente != 1 && tipoIncidente != 2){
+                    System.out.println("Error: el tipo debe ser 1 o 2.");
+                }
+
+            } while (tipoIncidente != 1 && tipoIncidente != 2);
+            
+        
 
 
             System.out.println("\nIngresar fecha del incidente: ");
@@ -159,7 +179,7 @@ public class Main {
                     for(int j = 0; j < sistemas.size(); j++){
 
                         System.out.println(" "+(j+1)+": " +sistemas.get(j).getNombreAplicacion());
-                        
+
                     }
                         System.out.println("\nSistema afectado: ");
                         int opcion = sc.nextInt();
@@ -246,6 +266,129 @@ public class Main {
 
 
 
+    //Inciso k). Registra tareas a un incidente y ademas marca si quedo resuelto.
+    static void registrarTareas(){
+    
+        Incidente inc = buscarIncidente();
+
+        if (inc == null){
+            System.out.println("No se encontro ningun incidente con el numero de registro ingresado");
+            return;
+        }
+        
+        //Muestra el nombre del informante del incidente
+        System.out.println("Incidente informado por: " +inc.getInformante().getNombre()+ " " +inc.getInformante().getApellido());
+
+        //De cada tarea se carga: fecha, descripcion, duracion en minutos
+        String otra;
+        do { 
+
+            System.out.println("Descripcion de la tarea: ");
+            String descr = sc.nextLine();
+
+            System.out.println("Tiempo insumido (minutos): ");
+            int min = sc.nextInt();
+            sc.nextLine();
+
+            inc.getTareas().add(new Tarea(descr, min));     //Agrego la tarea a ese incidente a un arreglo de tareas (puede haber mas de una tarea)
+                                                            //setTareas sirve para meter una lista entera de tareas ya precargada. Borra las anteriores
+
+
+            System.out.println("¿Desea cargar otra tarea? (s/n): ");
+            otra = sc.nextLine();
+
+        } while (otra.equalsIgnoreCase("s"));
+
+
+        System.out.println("¿El incidente quedo resuelto? (s/n): ");
+
+        if(sc.nextLine().equalsIgnoreCase("s")){
+
+            inc.setResuelto(true);
+            System.out.println("Incidente Nº: " +inc.getNumero()+ " marcado como resuelto.");
+
+        }
+        
+
+    }
+
+
+
+    //Me sirve para el inciso k y otros.
+    static Incidente buscarIncidente(){
+
+        Incidente encontrado;
+        do { 
+            System.out.println("\nIngrese numero de incidente: ");
+            int nro_incidente = sc.nextInt();
+            sc.nextLine();
+
+            encontrado = null;
+            for(Incidente inc : incidentes){
+
+                if(nro_incidente == inc.getNumero()){
+                    encontrado = inc;
+                }
+
+            }
+
+            if(encontrado == null){
+                System.out.println("El numero ingresado no corresponde a un incidente");
+            }
+
+        } while (encontrado == null);
+        
+
+        return encontrado;
+
+    }
+
+
+
+
+
+    //Inciso l). Pasar un argumento de area de trabajo y mostrar los siguientes parametros
+    static void listarResueltosDelMes(String area){
+
+        LocalDate hoy = LocalDate.now(); //Se toma la fecha de hoy para tomar el mes presente
+
+        System.out.println("\n--- Incidentes resueltos del mes - Area: " + area + " ---");
+
+        for(Incidente inc : incidentes){
+
+            boolean esDelMes = inc.getFechaRegistro().getMonthValue() == hoy.getMonthValue()    //La fecha de registro debe ser del ultimo mes del ultimo año
+                            && inc.getFechaRegistro().getYear() == hoy.getYear();               //Por eso comparo con el año y el mes de la variable 'hoy'
+                
+
+            if(inc.isResuelto() && esDelMes && inc.getInformante().getAreaTrabajo().equalsIgnoreCase(area)){    //Muestro el incidente si: 
+                                                                                                                //  a) fue resuelto
+                                                                                                                //  b) el area de trabajo del informante coincide con la pasada por parametro
+                                                                                                                //  c) el incidente fue registrado el ultimo mes del ultimo año              
+                System.out.println("\nNº de Incidente: " +inc.getNumero());
+                System.out.println("\nNombre del tecnico: " +inc.getTecnico().getNombre()+ " " +inc.getTecnico().getApellido());
+
+                switch (inc.getFormaReporte()) {
+                    
+                    case "Telefono" -> System.out.println("Informado por: llamada telefonica");
+                    case "Mail" -> System.out.println("Informado por: correo electronico");
+                    case "Chat" -> System.out.println("Informado por: chat");
+
+                }
+
+                System.out.println("Tareas realizadas:\n");
+                for(Tarea t : inc.getTareas()){
+                    System.out.println(" " + t.getFecha() + " - " +t.getDescripcion()+ " - " +t.getDuracionEnMinutos()+ " Min");
+                }
+
+                //Metodo polimorfico: cada subclase responde a su manera. Java mira de que tipo es el objeto y ejecuta la version de esa subclase
+                System.out.println(inc.getAfectado());
+
+
+            }
+            
+        }
+
+    }
 
 
 

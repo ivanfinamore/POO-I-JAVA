@@ -22,7 +22,18 @@ public class IncidenteSoftware extends Incidente {
     public void setSistemas(ArrayList<SistemaAfectado> sistemas) { this.sistemas = sistemas; }
 
 
-    
+    //Como responde Incidente Software al getAfectado (polimorfismo)
+    @Override 
+    public String getAfectado(){
+        String nombres = "Sistemas: ";
+
+        for (SistemaAfectado sa : sistemas){
+
+            nombres+= sa.getSistema().getNombreAplicacion();    // += agrega a lo que ya hay, por lo que nombres debe tener algo desde el principio
+
+        }
+        return nombres;
+    }
     
     
 }

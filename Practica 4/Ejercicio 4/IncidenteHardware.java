@@ -71,7 +71,11 @@ public class IncidenteHardware extends Incidente {
     
     }
 
-
+    //Lo que devuelve incidente de tipo hardware cuando le piden por equipo afectado (polimorfismo)
+    @Override 
+    public String getAfectado(){
+        return "Equipo " +direccionIP;
+    }
 
 
     
