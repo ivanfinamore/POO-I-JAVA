@@ -29,7 +29,7 @@ public class IncidenteSoftware extends Incidente {
 
         for (SistemaAfectado sa : sistemas){
 
-            nombres+= sa.getSistema().getNombreAplicacion();    // += agrega a lo que ya hay, por lo que nombres debe tener algo desde el principio
+            nombres+= " " + sa.getSistema().getNombreAplicacion();    // += agrega a lo que ya hay, por lo que nombres debe tener algo desde el principio
 
         }
         return nombres;

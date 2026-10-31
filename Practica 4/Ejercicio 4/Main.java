@@ -26,7 +26,7 @@ public class Main {
             System.out.println("2. Registrar tareas de un incidente");
             System.out.println("3. Incidentes resueltos del mes por area");
             System.out.println("4. Buscar repuestos cambiados");
-            System.out.println("5. Tecnicos sin asignar em los ultimos 6 meses");
+            System.out.println("5. Tecnicos sin asignar en los ultimos 6 meses");
             System.out.println("6. Hardware resueltos por encima del promedio");
             System.out.println("7. ¿Software pendientes son todos propios?");
             System.out.println("0. Salir");
@@ -41,7 +41,15 @@ public class Main {
 
                 case 2 -> registrarTareas();                            //k
 
-                case 3 -> listarResueltosDelMes(args[0]);                                              //l
+                case 3 -> listarResueltosDelMes(args[0]);               //l
+
+                case 4 -> buscarRepuestosCambiados();                   //m
+
+                case 5 -> tecnicosSinAsignar();                         //n
+
+                case 6 -> hardwareSobrePromedio();                      //o
+
+                case 7 -> softwarePendientesSonPropios();               //p
 
                 case 0 -> System.out.println("Fin del programa.");
 
@@ -391,7 +399,155 @@ public class Main {
     }
 
 
+    //Inciso m). Ingreso por teclado algunas letras de algun repuesto y el programa me muestra el ip y el nro de incidente de todos los incidentes hardware donde haya sido necesario el cambio de tal repuesto
+    static void buscarRepuestosCambiados(){
 
+        System.out.println("Ingrese letras del repuesto a buscar: ");
+        String letras = sc.nextLine().toLowerCase();
+        
+
+        int encontrados = 0;
+        for (Incidente inc : incidentes){
+
+            if (inc instanceof IncidenteHardware h){      //Es el casteo: inc es de tipo Incidente. Al castearlo a h (incidente hardware), Java permite usar los metodos de incidente hardware
+                                                               
+                boolean coincide = false;
+                for(String repuesto : h.getRepuestos()){
+
+                    if(repuesto.toLowerCase().contains(letras)){
+                        coincide = true;                            //Si encuentra al menos un repuesto, devuelve true
+                    }
+
+                }
+
+                if(coincide){               //Esta condicion sirve para no imprimir 2 veces el mismo incidente que utiliza 2 veces el mismo repuesto
+                        System.out.println("Incidente Nº: " +h.getNumero()+ " - IP: " +h.getDireccionIP());
+                        encontrados++;
+                    }
+                
+            }
+
+        }
+
+        if(encontrados == 0){
+            System.out.println("No se encontraron equipos con ese repuesto.");
+        }
+
+    }
+
+
+
+
+
+
+    //Inciso n). Mostrar por pantalla los tecnicos que no fueron asignados a incidentes durante los ultimos 6 meses
+    static void tecnicosSinAsignar(){
+        LocalDate hace6Meses = LocalDate.now().minusMonths(6); //toma fechas de incidentes menores a 6 meses
+        System.out.println("\n--- Tecnicos sin incidentes en los ultimos 6 meses ---\n");
+
+        
+        for(Empleado e : empleados){
+
+            if (e.isEsTecnico()){
+
+                boolean asignado = false;           //antes de evaluar cada tecnico, asignado esta en false
+                for(Incidente inc : incidentes){
+
+                    if(inc.getTecnico() == e && inc.getFechaRegistro().isAfter(hace6Meses)){
+                        asignado = true;
+                    }
+
+                }
+
+                if(!asignado){
+                    System.out.println(e.getNombre()+ " " +e.getApellido());
+                }
+
+           }
+
+        }
+
+    }
+
+
+
+
+
+
+
+    //Inciso o). Indicar la cantidad de incidentes hardware resueltos en mas tiempo que el lapso promedio de resolucion de cualquier tipo de incidente.
+    static void hardwareSobrePromedio(){
+        int total = 0;
+        int cant = 0;
+
+        //Primer pasada sobre incidentes contando incidentes y tiempo total, para saber el promedio
+        for(Incidente inc : incidentes){
+
+            if (inc.isResuelto()){
+                total += inc.getTiempoTotal();
+                cant++;
+            }
+            
+        }
+
+        if (cant == 0){
+            System.out.println("No hay incidentes resueltos.");
+            return;
+        }
+
+        double promedio = (double) total / cant;     //este es el casteo a double
+
+
+        //Segunda pasada, esta vez sobre incidente hardware, para chequear cuales estuvieron por encima del promedio en tiempo de resolucion
+        int mayoresAprom = 0;
+        for(Incidente inc : incidentes){
+
+            if(inc instanceof IncidenteHardware && inc.isResuelto()){   //Se evalua solo si es de hardware (casteo) y si fue resuelto
+                if(inc.getTiempoTotal() > promedio){
+                    mayoresAprom++;
+                }
+            }
+
+        }
+
+        System.out.printf("Promedio de resolucion (en minutos): %.2f min\n" +promedio);
+
+        if (mayoresAprom > 0){
+            System.out.println("Incidentes de tipo hardware por encima del promedio: " +mayoresAprom);
+        } else {
+            System.out.println("Ningun incidente de tipo hardware fue resuelto en un lapso de tiempo mayor al promedio");
+        }
+        
+    }
+
+
+
+
+
+
+    //Inciso p). Informar si todos los incidentes de software pendientes de resolucion corresponden a desarrollos propios
+    static void softwarePendientesSonPropios(){
+        boolean todosPropios = true;
+        for (Incidente inc : incidentes) {
+
+            if(inc instanceof IncidenteSoftware s && !s.isResuelto())  {    //Si el incidente es de tipo software y no esta resuelto aun
+                for (SistemaAfectado sa : s.getSistemas()){                 //Por cada sistema afectado dentro de la lista de sistemas
+
+                    if (!sa.getSistema().isDesarrolloPropio()){             //Si algun sistema afectado no pertenece a un desarrollo propio
+                        todosPropios = false;                               //Se informa que no todos los incidentes de software pendiente de resolucion corresponden a desarrollos propios
+                    }
+
+                }
+            }
+        }
+
+        if(todosPropios){
+            System.out.println("Si: todos los incidentes de software pendientes corresponden a desarrollos propios.");
+        } else {
+            System.out.println("No: hay incidentes de software pendientes en sistemas que no son propios.");
+        }
+
+    }
 
 
 }

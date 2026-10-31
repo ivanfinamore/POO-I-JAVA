@@ -68,7 +68,18 @@ public abstract class Incidente {
     public abstract String getAfectado();
 
     
-    
+    //Metodo que me sirve para el inciso o). Obtiene el total de minutos de todas las tareas de un incidente.
+    public int getTiempoTotal(){
+        int total = 0;
+
+        for (Tarea t : tareas){
+
+            total += t.getDuracionEnMinutos();
+
+        }
+        
+        return total;
+    }
 
 
     
